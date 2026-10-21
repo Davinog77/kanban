@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quadro Kanban Acadêmico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>📋 Quadro Kanban Acadêmico</h1>
+    </header>
+
+    <main class="container">
+        <!-- Formulário de Nova Tarefa -->
+        <section class="form-section">
+            <h2>Nova Tarefa</h2>
+            <form action="/add" method="POST">
+                <input type="text" name="titulo" maxlength="100" placeholder="Título da tarefa (ex: Estudar para prova)" required>
+                <input type="text" name="materia" maxlength="50" placeholder="Matéria/Disciplina (ex: Cálculo I)" required>
+                <textarea name="descricao" placeholder="Descrição curta da tarefa..."></textarea>
+                <button type="submit">Adicionar Tarefa</button>
+            </form>
+        </section>
+
+        <!-- Colunas do Kanban -->
+        <section class="kanban-board">
+            <!-- COLUNA: A FAZER -->
+            <div class="kanban-column" id="a_fazer">
+                <h3>📌 A Fazer</h3>
+                {% for tarefa in tarefas if tarefa.status == 'a_fazer' %}
+                <div class="task-card">
+                    <h4>{{ tarefa.titulo }}</h4>
+                    <span class="badge">{{ tarefa.materia }}</span>
+                    <p>{{ tarefa.descricao }}</p>
+                    <div class="actions">
+                        <form action="/update/{{ tarefa.id }}" method="POST">
+                            <input type="hidden" name="status" value="em_progresso">
+                            <button type="submit" class="btn btn-next">👉 Iniciar</button>
+                        </form>
+                        <form action="/delete/{{ tarefa.id }}" method="POST" class="delete-form"
+                              onsubmit="return confirm('Excluir esta tarefa?');">
+                            <button type="submit" class="btn btn-delete">🗑️</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- COLUNA: EM PROGRESSO -->
+            <div class="kanban-column" id="em_progresso">
+                <h3>⚡ Em Progresso</h3>
+                {% for tarefa in tarefas if tarefa.status == 'em_progresso' %}
+                <div class="task-card">
+                    <h4>{{ tarefa.titulo }}</h4>
+                    <span class="badge">{{ tarefa.materia }}</span>
+                    <p>{{ tarefa.descricao }}</p>
+                    <div class="actions">
+                        <form action="/update/{{ tarefa.id }}" method="POST">
+                            <input type="hidden" name="status" value="concluido">
+                            <button type="submit" class="btn btn-success">✅ Concluir</button>
+                        </form>
+                        <form action="/delete/{{ tarefa.id }}" method="POST" class="delete-form"
+                              onsubmit="return confirm('Excluir esta tarefa?');">
+                            <button type="submit" class="btn btn-delete">🗑️</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- COLUNA: CONCLUÍDO -->
+            <div class="kanban-column" id="concluido">
+                <h3>🎉 Concluído</h3>
+                {% for tarefa in tarefas if tarefa.status == 'concluido' %}
+                <div class="task-card completed">
+                    <h4>{{ tarefa.titulo }}</h4>
+                    <span class="badge">{{ tarefa.materia }}</span>
+                    <p>{{ tarefa.descricao }}</p>
+                    <div class="actions">
+                        <form action="/delete/{{ tarefa.id }}" method="POST"
+                              onsubmit="return confirm('Excluir esta tarefa?');">
+                            <button type="submit" class="btn btn-delete">Excluir Registro</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>
